@@ -4,6 +4,7 @@
   "private": true,
   "description": "Générateur de mini-scènes comiques pour Benji",
   "scripts": {
+    "dev": "netlify dev --port 8888 --dir public --functions netlify/functions",
     "build": "echo 'Site statique prêt'",
     "check": "netlify build"
   },

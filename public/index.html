@@ -557,6 +557,23 @@
       aiDescriptionStatus.className = `ai-status${kind ? ` ${kind}` : ""}`;
     }
 
+    function localDescription(scenario, location) {
+      const idea = clean(scenario) || "Benji vit une petite aventure inattendue";
+      const place = location === "Au choix" ? "le salon" : location.toLowerCase();
+      return `Dans ${place}, ${idea.charAt(0).toLowerCase()}${idea.slice(1)}. Benji observe la situation avec ses grandes oreilles dressées, avance prudemment et tente une petite action très sérieuse. L’objet bouge à peine : il sursaute, recule d’un pas, puis revient poser fièrement une patte dessus. Il regarde enfin la caméra, convaincu d’avoir accompli un exploit extraordinaire.`;
+    }
+
+    function applyAiDescription(description, usage, mode = "ai") {
+      themeInput.value = clean(description).slice(0, 500);
+      updateThemeCount();
+      document.querySelectorAll(".scenario").forEach(button => button.classList.remove("selected"));
+      usage.count += 1;
+      localStorage.setItem(AI_USAGE_KEY, JSON.stringify(usage));
+      aiDescriptionBtn.textContent = "🔄 Proposer une autre description";
+      const prefix = mode === "local" ? "Description locale ajoutée" : "Description ajoutée";
+      setAiStatus(`${prefix}. Vous pouvez la modifier. ${AI_DAILY_LIMIT - usage.count} proposition${AI_DAILY_LIMIT - usage.count === 1 ? "" : "s"} disponible${AI_DAILY_LIMIT - usage.count === 1 ? "" : "s"} aujourd’hui.`, "success");
+    }
+
     async function generateAiDescription() {
       const usage = getAiUsage();
       if (usage.count >= AI_DAILY_LIMIT) {
@@ -580,6 +597,9 @@
           })
         });
         const data = await response.json().catch(() => ({}));
+        if (response.status === 429) {
+          throw new Error("Benji a reçu beaucoup de demandes. Attendez quelques instants, puis réessayez.");
+        }
         if (!response.ok || !data.description) {
           throw new Error(data.error || "La proposition n’a pas pu être créée.");
         }
@@ -590,15 +610,14 @@
           return;
         }
 
-        themeInput.value = clean(data.description).slice(0, 500);
-        updateThemeCount();
-        document.querySelectorAll(".scenario").forEach(button => button.classList.remove("selected"));
-        usage.count += 1;
-        localStorage.setItem(AI_USAGE_KEY, JSON.stringify(usage));
-        aiDescriptionBtn.textContent = "🔄 Proposer une autre description";
-        setAiStatus(`Description ajoutée. Vous pouvez la modifier. ${AI_DAILY_LIMIT - usage.count} proposition${AI_DAILY_LIMIT - usage.count === 1 ? "" : "s"} disponible${AI_DAILY_LIMIT - usage.count === 1 ? "" : "s"} aujourd’hui.`, "success");
+        applyAiDescription(data.description, usage, data.mode);
       } catch (error) {
-        setAiStatus(error instanceof Error ? error.message : "Le service est momentanément indisponible.", "error");
+        const isLocal = location.protocol === "file:" || location.hostname === "localhost" || location.hostname === "127.0.0.1";
+        if (isLocal && themeInput.value === valueAtStart) {
+          applyAiDescription(localDescription(valueAtStart, document.getElementById("location").value), usage, "local");
+        } else {
+          setAiStatus(error instanceof Error ? error.message : "Le service est momentanément indisponible.", "error");
+        }
       } finally {
         aiDescriptionBtn.disabled = false;
       }
