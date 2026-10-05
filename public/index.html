@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#5b3426">
+  <title>Benji le Comique</title>
+  <style>
+    :root {
+      --cream: #fff8e9;
+      --cream-2: #f6ead2;
+      --paper: #fffdf8;
+      --chocolate: #573326;
+      --chocolate-2: #754936;
+      --blue: #d9ecf0;
+      --blue-dark: #2f6570;
+      --gold: #e7b95d;
+      --ink: #302b27;
+      --muted: #6d625a;
+      --green: #39765d;
+      --red: #a2493f;
+      --shadow: 0 12px 30px rgba(87, 51, 38, .11);
+      --radius: 24px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 12% 4%, rgba(231,185,93,.22), transparent 25rem),
+        radial-gradient(circle at 93% 23%, rgba(103,169,183,.14), transparent 24rem),
+        var(--cream);
+      font-family: ui-rounded, "Avenir Next", Avenir, "Segoe UI", Arial, sans-serif;
+      font-size: 18px;
+      line-height: 1.55;
+    }
+
+    button, select, textarea { font: inherit; }
+    button { touch-action: manipulation; }
+    .container { width: min(1120px, calc(100% - 32px)); margin: 0 auto; }
+
+    header {
+      position: relative;
+      overflow: hidden;
+      padding: 44px 0 36px;
+      color: white;
+      background: linear-gradient(135deg, #4b2b21 0%, #67402f 65%, #82543b 100%);
+    }
+    header::before, header::after {
+      content: "";
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255,255,255,.06);
+    }
+    header::before { width: 280px; height: 280px; right: -65px; top: -110px; }
+    header::after { width: 150px; height: 150px; left: 8%; bottom: -105px; }
+    .hero {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 176px 1fr;
+      gap: 30px;
+      align-items: center;
+    }
+    .avatar {
+      width: 176px;
+      height: 176px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 7px solid rgba(255,255,255,.92);
+      box-shadow: 0 10px 30px rgba(0,0,0,.28), 0 0 0 5px var(--gold);
+      background: #1c1512;
+    }
+    .avatar img { width: 100%; height: 100%; display: block; object-fit: cover; object-position: center 25%; }
+    h1 { margin: 0; font-size: clamp(2.35rem, 6vw, 4.6rem); line-height: .98; letter-spacing: -.045em; }
+    .tagline { margin: 16px 0 0; font-size: clamp(1.05rem, 2.5vw, 1.5rem); color: #f9e5b6; font-weight: 700; }
+    .hero-note { display: inline-flex; align-items: center; gap: 8px; margin-top: 16px; padding: 7px 12px; border-radius: 999px; background: rgba(255,255,255,.12); font-size: .9rem; }
+
+    main { padding: 32px 0 80px; }
+    .panel {
+      margin: 24px 0;
+      padding: clamp(22px, 4vw, 34px);
+      border: 1px solid rgba(87,51,38,.1);
+      border-radius: var(--radius);
+      background: rgba(255,253,248,.94);
+      box-shadow: var(--shadow);
+    }
+    .section-kicker { margin: 0 0 5px; color: var(--blue-dark); font-size: .82rem; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
+    h2 { margin: 0 0 8px; color: var(--chocolate); font-size: clamp(1.55rem, 3.5vw, 2.15rem); line-height: 1.18; }
+    h3 { color: var(--chocolate); }
+    .section-help { margin: 0 0 22px; color: var(--muted); }
+
+    .scenario-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .scenario {
+      min-height: 74px;
+      padding: 13px 15px;
+      border: 2px solid #eadcc8;
+      border-radius: 18px;
+      color: var(--chocolate);
+      background: #fffaf0;
+      font-weight: 800;
+      text-align: left;
+      cursor: pointer;
+      transition: transform .15s, border-color .15s, background .15s, box-shadow .15s;
+    }
+    .scenario:hover { transform: translateY(-2px); border-color: var(--gold); box-shadow: 0 6px 16px rgba(87,51,38,.09); }
+    .scenario.selected { color: white; border-color: var(--chocolate); background: var(--chocolate); }
+    .scenario span { display: block; margin-bottom: 2px; color: var(--gold); font-size: .82rem; }
+
+    label { display: block; margin-bottom: 9px; color: var(--chocolate); font-weight: 900; }
+    textarea, select {
+      width: 100%;
+      border: 2px solid #dfd3c3;
+      border-radius: 16px;
+      color: var(--ink);
+      background: white;
+      outline: none;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    textarea { min-height: 128px; padding: 17px; resize: vertical; }
+    select { min-height: 56px; padding: 10px 14px; }
+    textarea:focus, select:focus { border-color: var(--blue-dark); box-shadow: 0 0 0 4px rgba(47,101,112,.12); }
+    .counter { margin-top: 7px; color: var(--muted); font-size: .84rem; text-align: right; }
+    .ai-helper { margin-top: 14px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+    .ai-btn {
+      min-height: 52px;
+      padding: 12px 18px;
+      border: 0;
+      border-radius: 16px;
+      color: white;
+      background: linear-gradient(135deg, var(--blue-dark), #438996);
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 7px 16px rgba(47,101,112,.18);
+    }
+    .ai-btn:hover { transform: translateY(-1px); filter: brightness(1.04); }
+    .ai-btn:disabled { cursor: wait; opacity: .68; transform: none; }
+    .ai-status { flex: 1 1 240px; color: var(--muted); font-size: .9rem; }
+    .ai-status.error { color: var(--red); }
+    .ai-status.success { color: var(--green); }
+
+    .options-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+    .count-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .count-options input { position: absolute; opacity: 0; pointer-events: none; }
+    .count-options label {
+      margin: 0;
+      padding: 12px;
+      border: 2px solid #dfd3c3;
+      border-radius: 14px;
+      background: white;
+      text-align: center;
+      cursor: pointer;
+    }
+    .count-options input:checked + label { color: white; border-color: var(--blue-dark); background: var(--blue-dark); }
+    .format-note { grid-column: 1 / -1; padding: 15px 18px; border-radius: 15px; color: #244f58; background: var(--blue); font-weight: 800; }
+
+    .action-panel { padding: 22px; background: linear-gradient(135deg, #fff5db, #edf7f7); }
+    .primary-actions { display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 12px; }
+    .big-btn, .small-btn {
+      border: 0;
+      border-radius: 16px;
+      font-weight: 900;
+      cursor: pointer;
+      transition: transform .15s, filter .15s, box-shadow .15s;
+    }
+    .big-btn:hover, .small-btn:hover { transform: translateY(-2px); filter: brightness(1.04); }
+    .big-btn:active, .small-btn:active { transform: translateY(0); }
+    .big-btn { min-height: 68px; padding: 14px 18px; color: white; box-shadow: 0 8px 18px rgba(87,51,38,.15); }
+    .generate { background: var(--chocolate); }
+    .surprise { color: #513a10; background: var(--gold); }
+    .growl { background: var(--blue-dark); }
+
+    #resultsSection[hidden], #savedSection[hidden] { display: none; }
+    .results-head, .saved-head { display: flex; justify-content: space-between; gap: 16px; align-items: end; margin: 38px 0 16px; }
+    .results-head h2, .saved-head h2 { margin: 0; }
+    .idea-list { display: grid; gap: 20px; }
+    .idea-card {
+      overflow: hidden;
+      border: 1px solid rgba(87,51,38,.13);
+      border-radius: 24px;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+    .idea-card-top { display: flex; gap: 18px; align-items: flex-start; padding: 24px 26px; color: white; background: linear-gradient(120deg, var(--chocolate), var(--chocolate-2)); }
+    .idea-number { display: grid; flex: 0 0 48px; width: 48px; height: 48px; place-items: center; border-radius: 50%; color: var(--chocolate); background: var(--gold); font-weight: 1000; }
+    .idea-card-top h3 { margin: 0 0 3px; color: white; font-size: 1.35rem; }
+    .caption { margin: 0; color: #f7dfad; }
+    .idea-content { display: grid; gap: 15px; padding: 24px 26px; }
+    .field { padding: 17px; border-radius: 16px; background: #f8f1e6; }
+    .field.blue { background: #eaf5f6; }
+    .field-label { display: flex; align-items: center; gap: 7px; margin-bottom: 7px; color: var(--chocolate); font-size: .82rem; font-weight: 1000; letter-spacing: .06em; text-transform: uppercase; }
+    .field p { margin: 0; white-space: pre-line; }
+    .prompt-text { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .9rem; line-height: 1.6; }
+    .card-actions { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 0 26px 26px; }
+    .small-btn { min-height: 50px; padding: 10px 12px; color: var(--chocolate); background: #eee2d1; }
+    .small-btn.copy { color: white; background: var(--blue-dark); }
+    .small-btn.save { color: white; background: var(--green); }
+    .small-btn.danger { color: white; background: var(--red); }
+
+    .saved-card { padding: 20px; border-left: 7px solid var(--gold); border-radius: 17px; background: white; box-shadow: 0 7px 20px rgba(87,51,38,.08); }
+    .saved-card h3 { margin: 0 0 5px; }
+    .saved-meta { margin-bottom: 12px; color: var(--muted); font-size: .86rem; }
+    .saved-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 15px; }
+    .saved-actions .small-btn { min-height: 42px; }
+    .empty { padding: 30px; border: 2px dashed #d9c8b4; border-radius: 18px; color: var(--muted); text-align: center; }
+
+    .help-panel { background: #fff4d7; }
+    .help-steps { margin: 18px 0; padding-left: 28px; }
+    .help-steps li { margin: 9px 0; padding-left: 5px; }
+    .notice { padding: 15px 18px; border-left: 5px solid var(--blue-dark); border-radius: 12px; background: white; font-weight: 800; }
+    footer { padding: 28px 16px; color: #f5e5d5; background: var(--chocolate); text-align: center; }
+
+    .toast {
+      position: fixed;
+      z-index: 99;
+      right: 22px;
+      bottom: 22px;
+      max-width: calc(100% - 44px);
+      padding: 14px 20px;
+      border-radius: 14px;
+      color: white;
+      background: #263a31;
+      box-shadow: 0 12px 28px rgba(0,0,0,.25);
+      font-weight: 900;
+      opacity: 0;
+      transform: translateY(18px);
+      pointer-events: none;
+      transition: .22s ease;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    @media (max-width: 800px) {
+      .scenario-grid { grid-template-columns: repeat(2, 1fr); }
+      .primary-actions { grid-template-columns: 1fr; }
+      .card-actions { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 600px) {
+      body { font-size: 17px; }
+      .container { width: min(100% - 20px, 1120px); }
+      header { padding: 30px 0; text-align: center; }
+      .hero { grid-template-columns: 1fr; gap: 22px; justify-items: center; }
+      .avatar { width: 150px; height: 150px; }
+      .scenario-grid, .options-grid { grid-template-columns: 1fr; }
+      .scenario { min-height: 64px; }
+      .format-note { grid-column: auto; }
+      .panel { padding: 21px 17px; border-radius: 20px; }
+      .idea-card-top, .idea-content { padding: 20px 18px; }
+      .card-actions { grid-template-columns: 1fr; padding: 0 18px 20px; }
+      .results-head, .saved-head { align-items: flex-start; flex-direction: column; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container hero">
+      <div class="avatar">
+        <!-- Pour utiliser un fichier local plus tard, remplacez l'image ci-dessous par : <img src="benji.jpg" alt="Photo de Benji"> -->
+        <img id="benjiPhoto" alt="Photo de Benji">
+      </div>
+      <div>
+        <h1>Benji le Comique</h1>
+        <p class="tagline">Des mini-sketchs de 5 secondes pour Facebook</p>
+        <div class="hero-note">🐾 Simple, drôle et prêt à copier</div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="panel">
+      <p class="section-kicker">Étape 1</p>
+      <h2>Choisir un scénario rapide</h2>
+      <p class="section-help">Touchez simplement une idée. Elle sera ajoutée automatiquement au thème.</p>
+      <div class="scenario-grid" id="scenarioGrid"></div>
+    </section>
+
+    <section class="panel">
+      <p class="section-kicker">Étape 2</p>
+      <h2>Votre idée</h2>
+      <label for="theme">Écris une idée pour Benji</label>
+      <textarea id="theme" maxlength="500" placeholder="Exemple : Benji grogne devant une pantoufle comme si c’était un monstre…"></textarea>
+      <div class="counter"><span id="themeCount">0</span> / 500 caractères</div>
+      <div class="ai-helper">
+        <button class="ai-btn" id="aiDescriptionBtn" type="button">✨ Générer la description avec l’IA</button>
+        <div class="ai-status" id="aiDescriptionStatus" role="status" aria-live="polite">Choisissez un scénario, puis laissez l’IA proposer une petite scène. Le texte restera modifiable.</div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <p class="section-kicker">Étape 3</p>
+      <h2>Options simples</h2>
+      <div class="options-grid">
+        <div>
+          <label>Nombre d’idées</label>
+          <div class="count-options">
+            <input type="radio" name="count" id="count3" value="3"><label for="count3">3</label>
+            <input type="radio" name="count" id="count5" value="5" checked><label for="count5">5</label>
+            <input type="radio" name="count" id="count10" value="10"><label for="count10">10</label>
+          </div>
+        </div>
+        <div>
+          <label for="style">Style</label>
+          <select id="style">
+            <option>Facebook drôle</option>
+            <option>Réaliste mignon</option>
+            <option>Cartoon doux</option>
+            <option>Faux documentaire animalier</option>
+            <option>Chihuahua drama queen</option>
+            <option>Mini film d’action ridicule</option>
+            <option>Comédie familiale</option>
+          </select>
+        </div>
+        <div>
+          <label for="location">Lieu</label>
+          <select id="location">
+            <option>Cuisine</option><option>Salon</option><option>Sofa</option><option>Couverture</option>
+            <option>Voiture</option><option>Jardin</option><option>Fond noir studio</option><option selected>Au choix</option>
+          </select>
+        </div>
+        <div>
+          <label for="humor">Humour</label>
+          <select id="humor">
+            <option>doux</option><option selected>très drôle</option><option>dramatique</option>
+            <option>absurde léger</option><option>petit boss sérieux</option>
+          </select>
+        </div>
+        <div class="format-note">📱 Format vidéo : vertical 9:16, durée 5 à 6 secondes, idéal Facebook/Reels.</div>
+      </div>
+    </section>
+
+    <section class="panel action-panel">
+      <div class="primary-actions">
+        <button class="big-btn generate" id="generateBtn">✨ Générer les prompts</button>
+        <button class="big-btn surprise" id="surpriseBtn">🎲 Mode surprise</button>
+        <button class="big-btn growl" id="growlBtn">🦁 Benji grogne</button>
+      </div>
+    </section>
+
+    <section id="resultsSection" hidden>
+      <div class="results-head">
+        <div><p class="section-kicker">Vos créations</p><h2>Les idées de Benji</h2></div>
+        <span id="resultCount"></span>
+      </div>
+      <div class="idea-list" id="results"></div>
+    </section>
+
+    <section id="savedSection">
+      <div class="saved-head">
+        <div><p class="section-kicker">Votre galerie</p><h2>Mes idées sauvegardées</h2></div>
+        <button class="small-btn danger" id="clearSavedBtn">Tout effacer</button>
+      </div>
+      <div class="idea-list" id="savedIdeas"></div>
+    </section>
+
+    <section class="panel help-panel">
+      <h2>Comment l’utiliser ?</h2>
+      <ol class="help-steps">
+        <li>Choisis un scénario ou écris une idée.</li>
+        <li>Clique sur <strong>Générer les prompts</strong>.</li>
+        <li>Copie le prompt.</li>
+        <li>Colle-le dans ChatGPT, Grok ou ton outil vidéo préféré.</li>
+        <li>Crée une petite vidéo de Benji.</li>
+        <li>Publie-la sur Facebook.</li>
+      </ol>
+      <div class="notice">ℹ️ Ce site ne crée pas la vidéo directement. Il prépare seulement les meilleurs textes à copier.</div>
+    </section>
+  </main>
+
+  <footer>Fait avec tendresse pour Benji, mini patron officiel de la maison. 🐕</footer>
+  <div class="toast" id="toast" role="status" aria-live="polite">Copié !</div>
+
+  <script>
+    "use strict";
+
+    // Photo intégrée au document afin que ce fichier HTML reste entièrement autonome.
+    const BENJI_PHOTO = "data:image/jpeg;base64,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";
+    // La nouvelle photo approuvée est livrée comme fichier séparé afin de
+    // pouvoir ajuster son cadrage sans modifier tout le document HTML.
+    document.getElementById("benjiPhoto").src = "benji.jpeg";
+
+    const scenarioPresets = [
+      "Benji fait le boss", "Benji grogne comme un lion", "Benji détective",
+      "Benji devant le gros chien", "Benji protège la maison", "Benji et la pantoufle suspecte",
+      "Benji veut une gâterie", "Benji chanteur d’opéra", "Benji ninja ridicule",
+      "Benji confus", "Benji gardien de sécurité", "Benji zen mais pas longtemps"
+    ];
+
+    const funnyEndings = [
+      "il recule d’un mini-pas, puis regarde la caméra comme si tout était prévu",
+      "il reprend immédiatement une pose fière pour sauver les apparences",
+      "un petit bruit le surprend et il se cache dignement derrière un coussin",
+      "il donne un regard très sérieux à la caméra, en attente d’applaudissements",
+      "il s’assoit calmement, comme si sa mission était officiellement accomplie",
+      "il découvre que le danger était sa propre ombre et garde tout de même son air de chef",
+      "il éternue au pire moment, puis reprend sa pose héroïque",
+      "il réclame une gâterie comme salaire pour son courage"
+    ];
+
+    const facebookCaptions = [
+      "Petit format, très grande autorité. 🐾",
+      "Quand tu mesures 20 cm mais que tu diriges toute la maison.",
+      "Le courage de Benji est immense… surtout dans sa tête.",
+      "Personne n’avait demandé un chef, mais Benji est déjà en poste.",
+      "Une mission délicate menée par le plus petit des experts.",
+      "Benji : 2 kilos de chien, 200 kilos d’attitude.",
+      "Il avait un plan. Enfin… probablement.",
+      "Le patron est petit, mais la réunion est très sérieuse."
+    ];
+
+    const cameraStyles = [
+      "warm close-up with gentle handheld movement",
+      "low-angle hero shot that humorously exaggerates his confidence",
+      "soft medium shot with a quick reaction close-up",
+      "mock documentary framing with a subtle slow zoom",
+      "cinematic close-up followed by a tiny dramatic pull-back",
+      "eye-level pet camera with clean, simple comic timing"
+    ];
+
+    const locations = [
+      { fr: "une cuisine chaleureuse", en: "a cozy warm kitchen" },
+      { fr: "un salon familial", en: "a comfortable family living room" },
+      { fr: "un sofa moelleux", en: "a soft cozy sofa" },
+      { fr: "une couverture douillette", en: "a soft cozy blanket" },
+      { fr: "une voiture immobile et sécuritaire", en: "a safely parked comfortable car" },
+      { fr: "un jardin calme", en: "a calm sunny garden" },
+      { fr: "un fond noir de studio", en: "a clean black studio background" }
+    ];
+
+    const benjiActions = [
+      "avance avec une démarche de mini patron très concentré",
+      "inspecte les lieux avec le sérieux d’un agent secret",
+      "lève une patte comme pour donner un ordre important",
+      "bombe fièrement son petit poitrail",
+      "penche la tête avec une confusion très expressive",
+      "se fige dans une pose héroïque beaucoup trop sérieuse",
+      "fixe l’objet avec de grands yeux dramatiques",
+      "fait deux minuscules pas de ninja"
+    ];
+
+    const growlSituations = [
+      "Benji grogne devant une pantoufle suspecte",
+      "Benji grogne devant un gros chien très calme et amical",
+      "Benji grogne devant un aspirateur éteint",
+      "Benji grogne devant une chaise qui semble avoir bougé",
+      "Benji grogne pour protéger une gâterie",
+      "Benji grogne, recule discrètement, puis prétend que tout était prévu",
+      "Benji grogne comme un lion mais reste minuscule et adorable",
+      "Benji regarde la caméra après avoir grogné, comme s’il demandait du soutien"
+    ];
+
+    // Traductions locales : elles gardent le prompt principal en anglais, sans API.
+    const actionTranslations = {
+      "avance avec une démarche de mini patron très concentré": "walks forward with the intensely focused stride of a tiny boss",
+      "inspecte les lieux avec le sérieux d’un agent secret": "inspects the area with the seriousness of a secret agent",
+      "lève une patte comme pour donner un ordre important": "raises one paw as if giving an important order",
+      "bombe fièrement son petit poitrail": "proudly puffs out his tiny chest",
+      "penche la tête avec une confusion très expressive": "tilts his head with an extremely expressive confused look",
+      "se fige dans une pose héroïque beaucoup trop sérieuse": "freezes in an excessively serious heroic pose",
+      "fixe l’objet avec de grands yeux dramatiques": "stares at the object with wide dramatic eyes",
+      "fait deux minuscules pas de ninja": "takes two ridiculously tiny ninja steps"
+    };
+
+    const endingTranslations = {
+      "il recule d’un mini-pas, puis regarde la caméra comme si tout était prévu": "he takes one tiny step backward, then looks at the camera as if everything went according to plan",
+      "il reprend immédiatement une pose fière pour sauver les apparences": "he immediately returns to a proud pose to save face",
+      "un petit bruit le surprend et il se cache dignement derrière un coussin": "a tiny sound surprises him and he hides with great dignity behind a cushion",
+      "il donne un regard très sérieux à la caméra, en attente d’applaudissements": "he gives the camera a very serious look and waits for applause",
+      "il s’assoit calmement, comme si sa mission était officiellement accomplie": "he sits calmly as if his mission were officially complete",
+      "il découvre que le danger était sa propre ombre et garde tout de même son air de chef": "he discovers the threat was his own shadow but keeps his boss expression",
+      "il éternue au pire moment, puis reprend sa pose héroïque": "he sneezes at the worst possible moment, then resumes his heroic pose",
+      "il réclame une gâterie comme salaire pour son courage": "he demands a treat as payment for his courage"
+    };
+
+    const themeTranslations = {
+      "Benji fait le boss": "Benji acts like the boss of the house",
+      "Benji grogne comme un lion": "Benji gives a tiny theatrical growl as if he were a lion",
+      "Benji détective": "Benji investigates a harmless mystery like a serious detective",
+      "Benji devant le gros chien": "Benji tries to look brave in front of a much larger calm friendly dog",
+      "Benji protège la maison": "Benji protects the house like a miniature security chief",
+      "Benji et la pantoufle suspecte": "Benji investigates a suspicious slipper as if it were a major threat",
+      "Benji veut une gâterie": "Benji uses dramatic tactics to ask for a treat",
+      "Benji chanteur d’opéra": "Benji performs one tiny dramatic opera note",
+      "Benji ninja ridicule": "Benji attempts a ridiculous miniature ninja mission",
+      "Benji confus": "Benji becomes adorably confused by an ordinary harmless object",
+      "Benji gardien de sécurité": "Benji works as an overly serious miniature security guard",
+      "Benji zen mais pas longtemps": "Benji tries to stay zen until a harmless little distraction appears",
+      "Benji grogne devant une pantoufle suspecte": "Benji theatrically growls at a suspicious slipper",
+      "Benji grogne devant un gros chien très calme et amical": "Benji theatrically growls at a much larger calm friendly dog",
+      "Benji grogne devant un aspirateur éteint": "Benji theatrically growls at a switched-off vacuum cleaner",
+      "Benji grogne devant une chaise qui semble avoir bougé": "Benji theatrically growls at a chair that seems to have moved",
+      "Benji grogne pour protéger une gâterie": "Benji gives a tiny theatrical growl while guarding a treat",
+      "Benji grogne, recule discrètement, puis prétend que tout était prévu": "Benji gives a tiny growl, quietly backs away, then pretends it was planned",
+      "Benji grogne comme un lion mais reste minuscule et adorable": "Benji growls like a lion while remaining tiny and adorable",
+      "Benji regarde la caméra après avoir grogné, comme s’il demandait du soutien": "After a tiny growl, Benji looks at the camera as if asking for support"
+    };
+
+    const titleTemplates = [
+      "Benji, chef de {thing}", "Mission {thing} pour Benji", "Le mini boss de {thing}",
+      "Benji contre {thing}", "Alerte maximale : {thing}", "L’affaire du {thing}",
+      "Benji prend le contrôle", "Le courage selon Benji", "Opération {thing}",
+      "Benji avait presque un plan"
+    ];
+
+    const scripts = [
+      ["Benji entre dans le cadre avec un air très sérieux.", "{action}.", "Il affronte la situation avec une confiance démesurée.", "{ending}."],
+      ["Un plan rapproché montre le regard déterminé de Benji.", "Benji découvre le thème : {theme}.", "Il joue au grand héros pendant deux secondes.", "{ending}."],
+      ["Benji est immobile, en pleine concentration.", "Il lance sa mission liée à « {theme} ».", "Sa grande attitude contraste avec sa toute petite taille.", "{ending}."],
+      ["La caméra révèle Benji dans {place}.", "{action}.", "Un détail banal bouleverse son grand plan.", "{ending}."]
+    ];
+
+    const styleMap = {
+      "Facebook drôle": "gentle humorous pet video style, instantly readable Facebook comedy",
+      "Réaliste mignon": "realistic cute family comedy style",
+      "Cartoon doux": "soft cartoon-like animation, warm and tasteful",
+      "Faux documentaire animalier": "warm mock wildlife documentary style",
+      "Chihuahua drama queen": "adorable theatrical pet comedy with dramatic reactions",
+      "Mini film d’action ridicule": "playful miniature action-movie parody, harmless and cute",
+      "Comédie familiale": "warm family comedy style"
+    };
+
+    const scenarioGrid = document.getElementById("scenarioGrid");
+    const themeInput = document.getElementById("theme");
+    const aiDescriptionBtn = document.getElementById("aiDescriptionBtn");
+    const aiDescriptionStatus = document.getElementById("aiDescriptionStatus");
+    const results = document.getElementById("results");
+    const resultsSection = document.getElementById("resultsSection");
+    const savedIdeasEl = document.getElementById("savedIdeas");
+    const clearSavedBtn = document.getElementById("clearSavedBtn");
+    const STORAGE_KEY = "benji-le-comique-saved-v1";
+    const AI_USAGE_KEY = "benji-description-usage-v1";
+    const AI_DAILY_LIMIT = 10;
+    let currentIdeas = [];
+    let toastTimer;
+
+    const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+    const clean = text => String(text || "").replace(/[<>]/g, "").trim();
+    const escapeHtml = text => String(text || "").replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#039;" }[c]));
+    const chosenCount = () => Number(document.querySelector('input[name="count"]:checked').value);
+    const englishTheme = theme => themeTranslations[theme] || `Benji performs a gentle visual comedy scene inspired by this idea: “${clean(theme)}”`;
+
+    function getAiUsage() {
+      const today = new Date().toISOString().slice(0, 10);
+      try {
+        const saved = JSON.parse(localStorage.getItem(AI_USAGE_KEY));
+        return saved && saved.date === today ? saved : { date: today, count: 0 };
+      } catch {
+        return { date: today, count: 0 };
+      }
+    }
+
+    function setAiStatus(message, kind = "") {
+      aiDescriptionStatus.textContent = message;
+      aiDescriptionStatus.className = `ai-status${kind ? ` ${kind}` : ""}`;
+    }
+
+    async function generateAiDescription() {
+      const usage = getAiUsage();
+      if (usage.count >= AI_DAILY_LIMIT) {
+        setAiStatus("La limite de 10 propositions pour aujourd’hui est atteinte. Vous pourrez recommencer demain.", "error");
+        return;
+      }
+
+      const valueAtStart = themeInput.value;
+      aiDescriptionBtn.disabled = true;
+      setAiStatus("Benji prépare une nouvelle idée…");
+
+      try {
+        const response = await fetch("/api/benji-description", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            scenario: clean(valueAtStart),
+            style: document.getElementById("style").value,
+            location: document.getElementById("location").value,
+            humor: document.getElementById("humor").value
+          })
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok || !data.description) {
+          throw new Error(data.error || "La proposition n’a pas pu être créée.");
+        }
+
+        // Ne jamais écraser un texte modifié pendant que la requête était en cours.
+        if (themeInput.value !== valueAtStart) {
+          setAiStatus("La proposition est prête, mais votre texte a changé entre-temps : il a donc été conservé.", "success");
+          return;
+        }
+
+        themeInput.value = clean(data.description).slice(0, 500);
+        updateThemeCount();
+        document.querySelectorAll(".scenario").forEach(button => button.classList.remove("selected"));
+        usage.count += 1;
+        localStorage.setItem(AI_USAGE_KEY, JSON.stringify(usage));
+        aiDescriptionBtn.textContent = "🔄 Proposer une autre description";
+        setAiStatus(`Description ajoutée. Vous pouvez la modifier. ${AI_DAILY_LIMIT - usage.count} proposition${AI_DAILY_LIMIT - usage.count === 1 ? "" : "s"} disponible${AI_DAILY_LIMIT - usage.count === 1 ? "" : "s"} aujourd’hui.`, "success");
+      } catch (error) {
+        setAiStatus(error instanceof Error ? error.message : "Le service est momentanément indisponible.", "error");
+      } finally {
+        aiDescriptionBtn.disabled = false;
+      }
+    }
+
+    scenarioPresets.forEach((name, i) => {
+      const button = document.createElement("button");
+      button.className = "scenario";
+      button.innerHTML = `<span>${String(i + 1).padStart(2, "0")}</span>${escapeHtml(name)}`;
+      button.addEventListener("click", () => {
+        themeInput.value = name;
+        updateThemeCount();
+        document.querySelectorAll(".scenario").forEach(b => b.classList.remove("selected"));
+        button.classList.add("selected");
+        themeInput.focus();
+        showToast("Scénario choisi !");
+      });
+      scenarioGrid.appendChild(button);
+    });
+
+    function getPlace() {
+      const selected = document.getElementById("location").value;
+      if (selected === "Au choix") return pick(locations);
+      return locations.find(p => p.fr.toLowerCase().includes(selected.toLowerCase())) || pick(locations);
+    }
+
+    function shortThing(theme) {
+      return clean(theme)
+        .replace(/^Benji\s+/i, "")
+        .replace(/^(fait|veut|est|devant|et|grogne|protège)\s+/i, "")
+        .replace(/^(le|la|les|un|une|du|de la|des)\s+/i, "")
+        .slice(0, 34) || "la maison";
+    }
+
+    function createIdea(theme, forcedGrowl = false) {
+      const style = document.getElementById("style").value;
+      const humor = document.getElementById("humor").value;
+      const place = getPlace();
+      const action = pick(benjiActions);
+      const ending = pick(funnyEndings);
+      const actualTheme = forcedGrowl ? pick(growlSituations) : clean(theme) || pick(scenarioPresets);
+      const actualThemeEn = englishTheme(actualTheme);
+      const thing = shortThing(actualTheme);
+      const title = pick(titleTemplates).replace("{thing}", thing.charAt(0).toLowerCase() + thing.slice(1));
+      const caption = pick(facebookCaptions);
+      const description = `${actualTheme} dans ${place.fr}. Benji ${action}, puis ${ending}.`;
+      const camera = pick(cameraStyles);
+      const growlLine = forcedGrowl || /grogne/i.test(actualTheme)
+        ? "He gives one tiny theatrical growl that sounds ambitious but remains cute, harmless, and never aggressive."
+        : "His expression and body language create a clear visual joke.";
+      const humorEn = { "doux":"gentle", "très drôle":"very funny", "dramatique":"theatrical", "absurde léger":"lightly absurd", "petit boss sérieux":"serious tiny-boss" }[humor];
+      const prompt = `Create a 5–6 second vertical 9:16 humorous Facebook/Reels video featuring Benji, a very tiny compact brown-gray chocolate chihuahua with large upright triangular ears, big shiny dark expressive eyes, a short muzzle, a black nose, and beige-cream markings around his muzzle, cheeks, eyebrows, chest, and tiny paws. Benji is in ${place.en}. Scene: ${actualThemeEn}. He behaves like a dramatic miniature boss and ${actionTranslations[action]}. ${growlLine} Then ${endingTranslations[ending]}. Use ${styleMap[style]}, ${humorEn} humor, soft flattering light, ${camera}, and clean gentle comic timing. Keep Benji recognizable as the same tiny family chihuahua. Preserve his breed, very small size, compact body, coat colors, cream markings, ears, eyes, short muzzle, and lovable personality. Do not give him a human face. No violence, injury, real danger, horror, stressful mood, or frightening aggression. End on Benji's proud comic reaction.`;
+      const scriptTemplate = pick(scripts);
+      const fill = s => s.replace("{action}", action).replace("{theme}", actualTheme).replace("{place}", place.fr).replace("{ending}", ending);
+      const script = `0–1 s : ${fill(scriptTemplate[0])}\n1–3 s : ${fill(scriptTemplate[1])}\n3–5 s : ${fill(scriptTemplate[2])}\n5–6 s : ${fill(scriptTemplate[3])}`;
+      const shortPrompt = `Tiny expressive brown-gray chocolate chihuahua Benji in ${place.en}: ${actualThemeEn}. He acts like a dramatic little boss, then ${endingTranslations[ending]}. 5–6 seconds, vertical 9:16, ${styleMap[style]}, cute gentle family comedy, no danger or aggression.`;
+      return { id: Date.now() + Math.random(), date: new Date().toISOString(), title, caption, description, prompt, script, shortPrompt, theme: actualTheme, style, humor, location: place.fr, forcedGrowl };
+    }
+
+    function generate(mode) {
+      let count = mode === "normal" ? chosenCount() : 5;
+      let baseTheme = clean(themeInput.value);
+      if (mode === "normal" && !baseTheme) {
+        themeInput.focus();
+        showToast("Écrivez une idée ou choisissez un scénario.");
+        return;
+      }
+      if (mode === "surprise") baseTheme = "";
+      const forcedGrowl = mode === "growl";
+      currentIdeas = Array.from({ length: count }, () => createIdea(baseTheme, forcedGrowl));
+      renderResults();
+      resultsSection.hidden = false;
+      document.getElementById("resultCount").textContent = `${count} idée${count > 1 ? "s" : ""}`;
+      resultsSection.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function allIdeaText(idea) {
+      return `Titre Facebook :\n${idea.title}\n\nLégende Facebook :\n${idea.caption}\n\nDescription courte :\n${idea.description}\n\nPrompt vidéo optimisé :\n${idea.prompt}\n\nScript 5–6 secondes :\n${idea.script}\n\nVariante courte :\n${idea.shortPrompt}`;
+    }
+
+    function renderResults() {
+      results.innerHTML = currentIdeas.map((idea, index) => `
+        <article class="idea-card">
+          <div class="idea-card-top">
+            <div class="idea-number">${index + 1}</div>
+            <div><h3>${escapeHtml(idea.title)}</h3><p class="caption">${escapeHtml(idea.caption)}</p></div>
+          </div>
+          <div class="idea-content">
+            <div class="field"><div class="field-label">🎬 Description courte</div><p>${escapeHtml(idea.description)}</p></div>
+            <div class="field blue"><div class="field-label">🌍 Prompt vidéo optimisé — anglais</div><p class="prompt-text">${escapeHtml(idea.prompt)}</p></div>
+            <div class="field"><div class="field-label">⏱ Script 5–6 secondes</div><p>${escapeHtml(idea.script)}</p></div>
+            <div class="field blue"><div class="field-label">⚡ Variante courte</div><p class="prompt-text">${escapeHtml(idea.shortPrompt)}</p></div>
+          </div>
+          <div class="card-actions">
+            <button class="small-btn copy" data-action="copyPrompt" data-index="${index}">Copier le prompt</button>
+            <button class="small-btn" data-action="copyAll" data-index="${index}">Copier tout</button>
+            <button class="small-btn save" data-action="save" data-index="${index}">Sauvegarder</button>
+            <button class="small-btn" data-action="regenerate" data-index="${index}">Régénérer cette idée</button>
+          </div>
+        </article>`).join("");
+    }
+
+    results.addEventListener("click", event => {
+      const button = event.target.closest("button[data-action]");
+      if (!button) return;
+      const index = Number(button.dataset.index);
+      const idea = currentIdeas[index];
+      if (button.dataset.action === "copyPrompt") copyText(idea.prompt);
+      if (button.dataset.action === "copyAll") copyText(allIdeaText(idea));
+      if (button.dataset.action === "save") saveIdea(idea);
+      if (button.dataset.action === "regenerate") {
+        currentIdeas[index] = createIdea(idea.theme, idea.forcedGrowl);
+        renderResults();
+        showToast("Nouvelle idée générée !");
+      }
+    });
+
+    async function copyText(text) {
+      let copied = false;
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(text);
+          copied = true;
+        }
+      } catch { copied = false; }
+
+      // Fallback pour les navigateurs plus anciens ou les fichiers ouverts localement.
+      if (!copied) {
+        const area = document.createElement("textarea");
+        area.value = text;
+        area.setAttribute("readonly", "");
+        area.style.position = "fixed";
+        area.style.left = "-9999px";
+        area.style.top = "0";
+        document.body.appendChild(area);
+        area.select();
+        area.setSelectionRange(0, area.value.length);
+        try { copied = document.execCommand("copy"); } catch { copied = false; }
+        area.remove();
+      }
+      showToast(copied ? "Copié !" : "Sélectionnez le texte et copiez-le manuellement.");
+    }
+
+    function getSaved() {
+      try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+      catch { return []; }
+    }
+
+    function saveIdea(idea) {
+      const saved = getSaved();
+      if (saved.some(item => item.prompt === idea.prompt)) {
+        showToast("Cette idée est déjà sauvegardée.");
+        return;
+      }
+      saved.unshift({ ...idea, savedAt: new Date().toISOString() });
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
+      renderSaved();
+      showToast("Idée sauvegardée !");
+    }
+
+    function renderSaved() {
+      const saved = getSaved();
+      clearSavedBtn.style.display = saved.length ? "" : "none";
+      if (!saved.length) {
+        savedIdeasEl.innerHTML = `<div class="empty">Aucune idée sauvegardée pour le moment.<br>Utilisez le bouton <strong>Sauvegarder</strong> sur une création.</div>`;
+        return;
+      }
+      savedIdeasEl.innerHTML = saved.map((idea, index) => `
+        <article class="saved-card">
+          <h3>${escapeHtml(idea.title)}</h3>
+          <div class="saved-meta">${new Date(idea.savedAt || idea.date).toLocaleString("fr-CA")} · ${escapeHtml(idea.style)} · ${escapeHtml(idea.location)}</div>
+          <div>${escapeHtml(idea.caption)}</div>
+          <div class="saved-actions">
+            <button class="small-btn copy" data-saved-action="copy" data-index="${index}">Copier l’idée</button>
+            <button class="small-btn danger" data-saved-action="delete" data-index="${index}">Supprimer</button>
+          </div>
+        </article>`).join("");
+    }
+
+    savedIdeasEl.addEventListener("click", event => {
+      const button = event.target.closest("button[data-saved-action]");
+      if (!button) return;
+      const saved = getSaved();
+      const index = Number(button.dataset.index);
+      if (button.dataset.savedAction === "copy") copyText(allIdeaText(saved[index]));
+      if (button.dataset.savedAction === "delete") {
+        saved.splice(index, 1);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
+        renderSaved();
+        showToast("Idée supprimée.");
+      }
+    });
+
+    clearSavedBtn.addEventListener("click", () => {
+      if (confirm("Voulez-vous vraiment supprimer toutes les idées sauvegardées ?")) {
+        localStorage.removeItem(STORAGE_KEY);
+        renderSaved();
+        showToast("Galerie effacée.");
+      }
+    });
+
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove("show"), 2200);
+    }
+
+    function updateThemeCount() {
+      document.getElementById("themeCount").textContent = themeInput.value.length;
+    }
+
+    themeInput.addEventListener("input", () => {
+      updateThemeCount();
+      document.querySelectorAll(".scenario").forEach(b => b.classList.remove("selected"));
+    });
+    document.getElementById("generateBtn").addEventListener("click", () => generate("normal"));
+    document.getElementById("surpriseBtn").addEventListener("click", () => generate("surprise"));
+    document.getElementById("growlBtn").addEventListener("click", () => generate("growl"));
+    aiDescriptionBtn.addEventListener("click", generateAiDescription);
+
+    renderSaved();
+  </script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+{
+  "name": "benji-le-comique",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Générateur de mini-scènes comiques pour Benji",
+  "scripts": {
+    "build": "echo 'Site statique prêt'",
+    "check": "netlify build"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.67.0"
+  },
+  "devDependencies": {
+    "netlify-cli": "^23.11.0"
+  }
+}
